@@ -9,7 +9,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if ENV["KONG_PATH"]
     source = ENV["KONG_PATH"]
   else
-    source = "../kong"
+    source = "../apipanda"
   end
 
   if ENV['KONG_VB_MEM']
