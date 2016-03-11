@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'jet.dashboard',
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,7 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ],
+            ]
         },
     },
 ]
@@ -107,3 +109,5 @@ STATIC_ROOT = BASE_DIR + '/assets'
 
 KONG_ADMIN_URL = 'http://localhost:8001'
 KONG_ADMIN_SIMULATOR = False
+
+JET_DEFAULT_THEME = 'light-gray'
