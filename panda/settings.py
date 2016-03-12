@@ -38,11 +38,24 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles'
+)
+
+
+THIRD_PARTY_APPS = (
+    'tastypie',
     'jsonfield2',
     'django_ace',
     'kong_admin'
 )
+
+LOCAL_APPS = (
+    'app',
+    'workspace'
+)
+
+INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -60,7 +73,9 @@ ROOT_URLCONF = 'panda.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            'public/app/views'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -104,8 +119,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR + '/assets'
+STATIC_URL = '/assets/'
+STATIC_ROOT = BASE_DIR + '/public'
+
+
+STATICFILES_DIRS = (
+    BASE_DIR + "/public/site",
+    BASE_DIR + "/public/app"
+)
+
+TASTYPIE_ALLOW_MISSING_SLASH = True
+TASTYPIE_DEFAULT_FORMATS = ['json']
 
 KONG_ADMIN_URL = 'http://localhost:8001'
 KONG_ADMIN_SIMULATOR = False
