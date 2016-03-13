@@ -1,25 +1,34 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 
+from workspace.models import Organisation
 # Create your models here.
 
 
-class LocationModel(models.Model):
+class Billing(models.Model):
 
-    address = models.CharField(blank=False, null=False, max_length=255)
-    longitude = models.CharField(max_length=15)
+    reference = models.CharField(blank=False, null=False, max_length=255)
+    transaction_date = models.DateTimeField()
+    domain = models.CharField(max_length=15)
     latitude = models.CharField(max_length=15)
-    place_id = models.CharField(max_length=255)
+    card_type = models.CharField(max_length=32)
+    bank = models.CharField(max_length=255)
+    card_digits = models.CharField(max_length=4)
+    authorization_code = models.CharField(max_length=255,
+                                          blank=False, null=False)
     created_on = models.DateTimeField(auto_now_add=True)
+    customer = models.ForeignKey(User, related_name='bills')
+    organisation = models.ForeignKey(Organisation, related_name='bills')
 
     class Meta:
-        verbose_name = "location"
-        verbose_name_plural = "locations"
-        unique_together = (('longitude', 'latitude'),)
+        verbose_name = "Billing"
+        verbose_name_plural = "Billings"
+        unique_together = (('reference', 'authorization_code'),)
 
     def __str__(self):
-        return "{0}:{1}".format(self.pk, self.name)
+        return "{0}:{1}".format(self.pk, self.reference)
 
     def ___unicode__(self):
-        return "{0}:{1}".format(self.pk, self.name)
+        return "{0}:{1}".format(self.pk, self.reference)
