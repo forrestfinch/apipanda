@@ -17,13 +17,19 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from app.api import LocationResource
+from django.conf import settings
 
-location_resource = LocationResource()\
+from tastypie.api import Api
+
+from app import api
+
+resource = Api(api_name=settings.TASTYPIE_API_VERSION)
+
+resource.register(api.UserResource())
 
 urlpatterns = [
 
-    url(r'^api/', include(location_resource.urls)),
+    url(r'^api/', include(resource.urls)),
     url(r'^app/', TemplateView.as_view(template_name='home.html')),
     url(r'^$', TemplateView.as_view(template_name='index.html')),
 
@@ -31,6 +37,7 @@ urlpatterns = [
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     url(r'^control/', include(admin.site.urls)),
     url(r'^showconfig/', 'kong_admin.views.show_config'),
+    url(r'ab/', include('experiments.urls')),
 
     # Everyother views redirects here
     # url(r'^', TemplateView.as_view(template_name='404.html')),

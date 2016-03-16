@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
-from django.db import models
 from django.contrib.auth.models import User
+
+from jsonfield2.managers import models, JSONAwareManager as Manager
+from jsonfield2 import JSONField
 
 from workspace.models import Workspace
 # Create your models here.
@@ -17,6 +19,9 @@ class Api(models.Model):
     creator = models.ForeignKey(User, related_name='apis')
     workspace = models.ForeignKey(Workspace, related_name='apis')
     active = models.BooleanField(default=True)
+    login_required = models.BooleanField(default=False)
+
+    manager = Manager
 
     class Meta:
         verbose_name = "Api"
@@ -33,6 +38,7 @@ class Endpoint(models.Model):
     request_path = models.CharField(max_length=255, blank=False, null=False,
                                     verbose_name='path')
     active = models.BooleanField(default=True)
+    schema = JSONField()
     api = models.ForeignKey(Api, related_name='endpoints')
 
     class Meta:
