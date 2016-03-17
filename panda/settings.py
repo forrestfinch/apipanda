@@ -40,15 +40,15 @@ INTERNAL_IPS = (
 HOST = 'apipanda.com'
 SITE_ID = 1
 
-ADMINS = [
-    ('Bernard', 'bernardojengwa@gmail.com'),
-]
-MANAGERS = [
-    ('Bernard', 'bernardojengwa@gmail.com'),
-]
+# ADMINS = [
+#     ('Bernard', 'bernardojengwa@gmail.com'),
+# ]
+# MANAGERS = [
+#     ('Bernard', 'bernardojengwa@gmail.com'),
+# ]
 # Application definition
-DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
-SERVER_EMAIL = 'server@apipanda.com'
+# DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
+# SERVER_EMAIL = 'server@apipanda.com'
 
 INSTALLED_APPS = (
     'jet.dashboard',
