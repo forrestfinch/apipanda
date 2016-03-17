@@ -72,8 +72,7 @@ THIRD_PARTY_APPS = (
     'jsonfield2',
     'django_ace',
     'kong_admin',
-    'django_extensions',
-    'subdomains'
+    'django_extensions'
 )
 
 LOCAL_APPS = (
@@ -89,7 +88,6 @@ INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
@@ -99,16 +97,8 @@ MIDDLEWARE_CLASSES = (
     'experiments.middleware.ExperimentsRetentionMiddleware',
 )
 
-ROOT_URLCONF = 'panda.urls.default'
+ROOT_URLCONF = 'panda.urls'
 
-SUBDOMAIN_URLCONFS = {
-    None: 'panda.urls.default',
-    'www': 'panda.urls.default',
-    'api': 'panda.urls.api',
-    'admin': 'panda.urls.admin',
-    # 'docs': 'panda.urls.docs',
-    # 'hubs': 'panda.urls.hubs',
-}
 
 TEMPLATES = [
     {
@@ -169,23 +159,23 @@ AUTHENTICATION_BACKENDS = (
     "app.backends.AuthBackend",
 )
 
-# CSRF_COOKIE_DOMAIN = '.apipanda.com'
-# CSRF_TRUSTED_ORIGINS = [
-#     '.apipanda.com'
-# ]
+CSRF_COOKIE_DOMAIN = '.apipanda.com'
+CSRF_TRUSTED_ORIGINS = [
+    '.apipanda.com'
+]
 
-# LOGIN_REDIRECT_URL = '/account'
-# LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/account'
+LOGIN_URL = '/login'
 
-# SESSION_COOKIE_DOMAIN = '.apipanda.com'
-# SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_DOMAIN = '.apipanda.com'
+SESSION_COOKIE_SECURE = not DEBUG
 
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
-# SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
-# # SECURE_HSTS_SECONDS =
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
+# SECURE_HSTS_SECONDS =
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# SECURE_SSL_REDIRECT = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
 
 # Email Backends
 EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
