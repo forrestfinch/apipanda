@@ -44,8 +44,11 @@ ADMINS = [
 MANAGERS = [
     ('Bernard', 'bernardojengwa@gmail.com'),
 ]
-# Application definition
+
 DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
+SERVER_EMAIL = 'server@apipanda.com'
+
+# Application definition
 
 INSTALLED_APPS = (
     'jet.dashboard',
