@@ -23,6 +23,7 @@ class Organisation(models.Model):
     url = models.URLField(blank=False, null=False, max_length=255)
     creator = models.ForeignKey(User, related_name='orgs_created')
     owner = models.ForeignKey(User, related_name='orgs_owned')
+    logo = models.ImageField(upload_to='organisations')
     plan = models.CharField(
         verbose_name=_("Plan"), max_length=16, choices=PLANS,
         default=FREE,
