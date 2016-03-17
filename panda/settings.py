@@ -40,15 +40,16 @@ INTERNAL_IPS = (
 HOST = 'apipanda.com'
 SITE_ID = 1
 
-# ADMINS = [
-#     ('Bernard', 'bernardojengwa@gmail.com'),
-# ]
-# MANAGERS = [
-#     ('Bernard', 'bernardojengwa@gmail.com'),
-# ]
+ADMINS = [
+    ('Bernard', 'bernardojengwa@gmail.com'),
+]
+MANAGERS = [
+    ('Bernard', 'bernardojengwa@gmail.com'),
+]
+
 # Application definition
-# DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
-# SERVER_EMAIL = 'server@apipanda.com'
+DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
+SERVER_EMAIL = 'server@apipanda.com'
 
 INSTALLED_APPS = (
     'jet.dashboard',
@@ -186,6 +187,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SECURE_SSL_REDIRECT = not DEBUG
 
+# Email Backends
+EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
+MAILGUN_ACCESS_KEY = 'key-03d06075b2acaafcab7ca62a5f05ab72'
+MAILGUN_SERVER_NAME = 'mg.apipanda.com'
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
