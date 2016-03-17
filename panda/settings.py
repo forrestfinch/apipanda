@@ -34,11 +34,9 @@ ALLOWED_HOSTS = [
 ]
 INTERNAL_IPS = (
     '127.0.0.1',
-    '104.196.59.185'
 )
 
 HOST = 'apipanda.com'
-SITE_ID = 1
 
 ADMINS = [
     ('Bernard', 'bernardojengwa@gmail.com'),
@@ -46,10 +44,8 @@ ADMINS = [
 MANAGERS = [
     ('Bernard', 'bernardojengwa@gmail.com'),
 ]
-
 # Application definition
 DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
-SERVER_EMAIL = 'server@apipanda.com'
 
 INSTALLED_APPS = (
     'jet.dashboard',
@@ -60,8 +56,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites'
+    'django.contrib.staticfiles'
 )
 
 
@@ -87,6 +82,7 @@ INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -99,6 +95,13 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'panda.urls'
 
+# SUBDOMAIN_URLCONFS = {
+#     None: 'panda.urls.client',
+#     'www': 'panda.urls.client',
+#     'api': 'panda.urls.api',
+#     'docs': 'panda.urls.docs',
+#     'hubs': 'panda.urls.hubs',
+# }
 
 TEMPLATES = [
     {
@@ -164,23 +167,11 @@ CSRF_TRUSTED_ORIGINS = [
     '.apipanda.com'
 ]
 
-LOGIN_REDIRECT_URL = '/account'
-LOGIN_URL = '/login'
-
-SESSION_COOKIE_DOMAIN = '.apipanda.com'
-SESSION_COOKIE_SECURE = not DEBUG
-
-SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
-SECURE_CONTENT_TYPE_NOSNIFF = not DEBUG
-# SECURE_HSTS_SECONDS =
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-SECURE_SSL_REDIRECT = not DEBUG
-
 # Email Backends
 EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
 MAILGUN_ACCESS_KEY = 'key-03d06075b2acaafcab7ca62a5f05ab72'
 MAILGUN_SERVER_NAME = 'mg.apipanda.com'
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -223,38 +214,3 @@ KONG_ADMIN_URL = 'http://localhost:8001'
 KONG_ADMIN_SIMULATOR = False
 
 JET_DEFAULT_THEME = 'light-gray'
-
-# Logs
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format':
-            "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt': "%d/%b/%Y %H:%M:%S"
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'mysite.log',
-            'formatter': 'verbose'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'MYAPP': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-        },
-    }
-}
