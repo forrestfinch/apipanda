@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
 ]
 INTERNAL_IPS = (
     '127.0.0.1',
+    '104.196.59.185'
 )
 
 HOST = 'apipanda.com'
@@ -171,9 +172,10 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Email Backends
-EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-MAILGUN_ACCESS_KEY = 'key-03d06075b2acaafcab7ca62a5f05ab72'
-MAILGUN_SERVER_NAME = 'mg.apipanda.com'
+if not DEBUG:
+    EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
+    MAILGUN_ACCESS_KEY = 'key-03d06075b2acaafcab7ca62a5f05ab72'
+    MAILGUN_SERVER_NAME = 'mg.apipanda.com'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

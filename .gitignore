@@ -62,3 +62,6 @@ dump.py
 
 # Heroku deps
 Procfile
+
+# Vagrant
+Vagrantfile
