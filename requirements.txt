@@ -14,6 +14,7 @@ django-kong-admin==0.4.0
 django-modeldict==1.4.1
 django-modeldict-yplan==1.5.0
 django-reversion==1.10.1
+django-subdomains==2.0.4
 django-tastypie==0.13.3
 enum34==1.1.2
 gargoyle==0.11.0
@@ -25,6 +26,7 @@ mock==1.0.1
 nexus==0.3.1
 oauth2client==2.0.1
 ordereddict==1.1
+Pillow==3.1.1
 psycopg2==2.6.1
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
