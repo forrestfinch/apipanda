@@ -50,7 +50,7 @@ coverage.xml
 *.pot
 # Django stuff:
 *.log
-
+logs
 # Sphinx documentation
 docs/_build/
 
@@ -62,6 +62,6 @@ dump.py
 
 # Heroku deps
 Procfile
-
+*.conf*
 # Vagrant
 Vagrantfile
