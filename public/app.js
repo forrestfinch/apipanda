@@ -1,4 +1,6 @@
 var app = angular.module("panda", [
+    'ngStorage',
     'ngCookies',
-    'ngRoute'
+    'ngRoute',
+    'ajoslin.promise-tracker'
 ]);

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from django.utils.translation import ugettext_lazy as _
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,13 +22,32 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'r04=z95t^(mcw_9ahqtjkb=h(qflaadvow=kuh#-vl8g$qt4e+'
+SECRET_KEY = os.getenv(
+    'SECRET_KEY', 'r04=z95t^(mcw_9ahqtjkb=h(qflaadvow=kuh#-vl8g$qt4e+')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('ENV', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".apipanda.com",
+    "panda.dev"
+]
+INTERNAL_IPS = (
+    '127.0.0.1',
+    '104.196.59.185'
+)
 
+HOST = 'apipanda.com'
+
+ADMINS = [
+    ('Bernard', 'bernardojengwa@gmail.com'),
+]
+MANAGERS = [
+    ('Bernard', 'bernardojengwa@gmail.com'),
+]
+
+DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
+SERVER_EMAIL = 'server@apipanda.com'
 
 # Application definition
 
@@ -34,6 +55,7 @@ INSTALLED_APPS = (
     'jet.dashboard',
     'jet',
     'django.contrib.admin',
+    'django.contrib.humanize',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -43,15 +65,20 @@ INSTALLED_APPS = (
 
 
 THIRD_PARTY_APPS = (
+    'experiments',
     'tastypie',
+    'jsonfield',
     'jsonfield2',
     'django_ace',
-    'kong_admin'
+    'kong_admin',
+    'django_extensions'
 )
 
 LOCAL_APPS = (
     'app',
-    'workspace'
+    'workspace',
+    'endpoint',
+    'plugin'
 )
 
 INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
@@ -59,6 +86,7 @@ INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -66,15 +94,24 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'experiments.middleware.ExperimentsRetentionMiddleware',
 )
 
 ROOT_URLCONF = 'panda.urls'
+
+# SUBDOMAIN_URLCONFS = {
+#     None: 'panda.urls.client',
+#     'www': 'panda.urls.client',
+#     'api': 'panda.urls.api',
+#     'docs': 'panda.urls.docs',
+#     'hubs': 'panda.urls.hubs',
+# }
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'public/app/views'
+            os.path.join(BASE_DIR, 'public/app/views')
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -87,6 +124,10 @@ TEMPLATES = [
         },
     },
 ]
+FILE_UPLOAD_HANDLERS = (
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+)
 
 WSGI_APPLICATION = 'panda.wsgi.application'
 
@@ -94,16 +135,55 @@ WSGI_APPLICATION = 'panda.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
+if not DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'NAME': os.getenv('DB_NAME', 'panda'),
+            'PORT': os.getenv('DB_PORT', 5432),
+            'USER': os.getenv('DB_USER', 'bernard'),
+            'PASSWORD': os.getenv('DB_PASS', '[]')
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+
+CACHES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'KEY_PREFIX': 'APIPANDA_CACHE'
     }
 }
 
+# Authntication Backends
+AUTHENTICATION_BACKENDS = (
+    "app.backends.AuthBackend",
+)
+
+CSRF_COOKIE_DOMAIN = '.apipanda.com'
+CSRF_TRUSTED_ORIGINS = [
+    '.apipanda.com'
+]
+
+# Email Backends
+if not DEBUG:
+    EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
+    MAILGUN_ACCESS_KEY = 'key-03d06075b2acaafcab7ca62a5f05ab72'
+    MAILGUN_SERVER_NAME = 'mg.apipanda.com'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
+
+LANGUAGE_COOKIE_NAME = 'apipanda_language'
+LANGUAGES = [
+    ('en', _('English')),
+]
 
 LANGUAGE_CODE = 'en-us'
 
@@ -115,21 +195,25 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/assets/'
-STATIC_ROOT = BASE_DIR + '/public'
+STATIC_ROOT = os.path.join(BASE_DIR, "public")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 
 
 STATICFILES_DIRS = (
-    BASE_DIR + "/public/site",
-    BASE_DIR + "/public/app"
+    os.path.join(BASE_DIR, "public/site"),
+    os.path.join(BASE_DIR, "public/app")
 )
 
 TASTYPIE_ALLOW_MISSING_SLASH = True
-TASTYPIE_DEFAULT_FORMATS = ['json']
+TASTYPIE_DEFAULT_FORMATS = ['json', 'jsonp']
+
+TASTYPIE_API_VERSION = 'v1'
 
 KONG_ADMIN_URL = 'http://localhost:8001'
 KONG_ADMIN_SIMULATOR = False

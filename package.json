@@ -1,0 +1,22 @@
+{
+  "name": "apipanda",
+  "version": "1.0.0",
+  "description": "Apipanda is a fast, secure and scalable developers hub for managing and extending API/Microservice platforms; featuring an API gateway, analytics/business intelligence, sandboxes, developer portal and more.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ojengwa/apipanda.git"
+  },
+  "author": "Bernard Ojengwa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ojengwa/apipanda/issues"
+  },
+  "homepage": "https://github.com/ojengwa/apipanda#readme",
+  "dependencies": {
+    "yuglify": "^0.1.4"
+  }
+}

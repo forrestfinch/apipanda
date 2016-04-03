@@ -1,7 +1,12 @@
 from __future__ import unicode_literals
 
-from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
+
+from jsonfield2.managers import models, JSONAwareManager as Manager
+from jsonfield2 import JSONField
+
+from request.models import Request as Requests
 
 from workspace.models import Workspace
 # Create your models here.
@@ -17,10 +22,13 @@ class Api(models.Model):
     creator = models.ForeignKey(User, related_name='apis')
     workspace = models.ForeignKey(Workspace, related_name='apis')
     active = models.BooleanField(default=True)
+    login_required = models.BooleanField(default=False)
+
+    manager = Manager
 
     class Meta:
-        verbose_name = "Api"
-        verbose_name_plural = "Apis"
+        verbose_name = "API"
+        verbose_name_plural = "APIs"
 
     def __str__(self):
         self.name
@@ -33,14 +41,27 @@ class Endpoint(models.Model):
     request_path = models.CharField(max_length=255, blank=False, null=False,
                                     verbose_name='path')
     active = models.BooleanField(default=True)
-    api = models.ForeignKey(Api, related_name='endpoints')
+    schema = JSONField()
+    api = models.ForeignKey(Api, related_name='apis')
 
     class Meta:
         verbose_name = "Endpoint"
         verbose_name_plural = "Endpoints"
 
     def __str__(self):
-        self.name
+        self.request_path
 
     def __unicode__(self):
-        self.name
+        self.request_path
+
+
+class Request(Requests):
+
+    meta = JSONField()
+    client = models.ForeignKey(User, related_name='requests')
+    endpoint = models.ForeignKey(Endpoint, related_name='requests')
+    api = models.ForeignKey(Api, related_name='requests')
+
+    def __unicode__(self):
+        return '[%s] %s %s %s' % (self.time, self.method,
+                                  self.path, self.response)

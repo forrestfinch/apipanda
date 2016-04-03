@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -22,7 +22,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
-
+django
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -48,18 +48,20 @@ coverage.xml
 # Translations
 *.mo
 *.pot
-panda/settings.*
 # Django stuff:
 *.log
-
+logs
 # Sphinx documentation
 docs/_build/
 
 # PyBuilder
 target/
-
+dump.py
 #Ipython Notebook
 .ipynb_checkpoints
 
 # Heroku deps
 Procfile
+*.conf*
+# Vagrant
+Vagrantfile
