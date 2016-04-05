@@ -30,7 +30,7 @@ DEBUG = os.getenv('ENV', False)
 
 ALLOWED_HOSTS = [
     ".apipanda.com",
-    "panda.dev"
+    ".panda.dev"
 ]
 INTERNAL_IPS = (
     '127.0.0.1',
@@ -38,6 +38,7 @@ INTERNAL_IPS = (
 )
 
 HOST = 'apipanda.com'
+SITE_ID = 1
 
 ADMINS = [
     ('Bernard', 'bernardojengwa@gmail.com'),
@@ -49,69 +50,121 @@ MANAGERS = [
 DEFAULT_FROM_EMAIL = 'bernard@apipanda.com'
 SERVER_EMAIL = 'server@apipanda.com'
 
-# Application definition
 
-INSTALLED_APPS = (
-    'jet.dashboard',
-    'jet',
-    'django.contrib.admin',
-    'django.contrib.humanize',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles'
+# Database
+# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
+
+if not DEBUG:
+    ROOT_URLCONF = 'panda.urls.client'
+    DEFAULT_URL_SCHEME = 'https'
+    DATABASES = {
+        'default': {
+            'ENGINE': 'tenant_schemas.postgresql_backend',
+            'HOST': os.getenv('DB_HOST'),
+            'NAME': os.getenv('DB_NAME'),
+            'PORT': os.getenv('DB_PORT'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASS')
+        }
+    }
+else:
+    ROOT_URLCONF = 'panda.urls.admin'
+    DEFAULT_URL_SCHEME = 'http'
+    DATABASES = {
+        'default': {
+            'ENGINE': 'tenant_schemas.postgresql_backend',
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'NAME': os.getenv('DB_NAME', 'panda'),
+            'PORT': os.getenv('DB_PORT', 5433),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASS', '[]')
+        }
+    }
+
+DATABASE_ROUTERS = (
+    'tenant_schemas.routers.TenantSyncRouter',
 )
-
-
-THIRD_PARTY_APPS = (
-    'experiments',
-    'tastypie',
-    'jsonfield',
-    'jsonfield2',
-    'django_ace',
-    'kong_admin',
-    'django_extensions'
-)
-
-LOCAL_APPS = (
-    'app',
-    'workspace',
-    'endpoint',
-    'plugin'
-)
-
-INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
 
 
 MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    # 'subdomains.middleware.SubdomainURLRoutingMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'panda.middleware.SubdomainMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'subdomains.middleware.SubdomainURLRoutingMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'request.middleware.RequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'experiments.middleware.ExperimentsRetentionMiddleware',
 )
 
-ROOT_URLCONF = 'panda.urls'
 
-# SUBDOMAIN_URLCONFS = {
-#     None: 'panda.urls.client',
-#     'www': 'panda.urls.client',
-#     'api': 'panda.urls.api',
-#     'docs': 'panda.urls.docs',
-#     'hubs': 'panda.urls.hubs',
-# }
+# Application definition
+
+SHARED_APPS = (
+    'tenant_schemas',
+    'workspace',
+    'app',
+
+    'django.contrib.contenttypes',
+
+    'jet.dashboard',
+    'jet',
+    'django.contrib.admin',
+    'django.contrib.humanize',
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    'experiments',
+    'tastypie',
+    'jsonfield',
+    'jsonfield2',
+    'django_ace',
+    'request',
+    'django_extensions',
+    'subdomains',
+    'endpoint',
+    # 'permissionsx',
+    # 'pipeline',
+    'redis',
+    'plugin',
+
+    'kong_admin',
+)
+
+TENANT_APPS = (
+    'django.contrib.contenttypes',
+    'private'
+)
+
+INSTALLED_APPS = list(
+    SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+TENANT_MODEL = 'app.Client'
+PUBLIC_SCHEMA_NAME = 'public'
+
+
+# PUBLIC_SCHEMA_URLCONF = 'panda.urls.client'
+
+SUBDOMAIN_URLCONFS = {
+    None: 'panda.urls.admin',
+    'www': 'panda.urls.admin',
+    'api': 'panda.urls.api',
+    'admin': 'panda.urls.admin'
+}
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'public/app/views')
+            os.path.join(BASE_DIR, 'public/app/views'),
+            os.path.join(BASE_DIR, 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -124,6 +177,7 @@ TEMPLATES = [
         },
     },
 ]
+
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
@@ -131,33 +185,18 @@ FILE_UPLOAD_HANDLERS = (
 
 WSGI_APPLICATION = 'panda.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-
-if not DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'NAME': os.getenv('DB_NAME', 'panda'),
-            'PORT': os.getenv('DB_PORT', 5432),
-            'USER': os.getenv('DB_USER', 'bernard'),
-            'PASSWORD': os.getenv('DB_PASS', '[]')
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
-    }
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'KEY_PREFIX': 'APIPANDA_CACHE'
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/10",
+        'KEY_PREFIX': 'APIPANDA_CACHE',
+        'KEY_FUNCTION': 'tenant_schemas.cache.make_key',
+        'REVERSE_KEY_FUNCTION': 'tenant_schemas.cache.reverse_key',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
@@ -166,16 +205,22 @@ AUTHENTICATION_BACKENDS = (
     "app.backends.AuthBackend",
 )
 
-CSRF_COOKIE_DOMAIN = '.apipanda.com'
-CSRF_TRUSTED_ORIGINS = [
-    '.apipanda.com'
-]
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/dashboard'
+LOGOUT_URL = '/'
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Email Backends
 if not DEBUG:
     EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
     MAILGUN_ACCESS_KEY = 'key-03d06075b2acaafcab7ca62a5f05ab72'
     MAILGUN_SERVER_NAME = 'mg.apipanda.com'
+    CSRF_COOKIE_DOMAIN = '.apipanda.com'
+    CSRF_TRUSTED_ORIGINS = [
+        '.apipanda.com',
+    ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -198,24 +243,101 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "public/site"),
+    os.path.join(BASE_DIR, "public/app"),
+    os.path.join(BASE_DIR, "bower_components")
+)
+
+# STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # 'pipeline.finders.PipelineFinder',
+)
+
 STATIC_URL = '/assets/'
 STATIC_ROOT = os.path.join(BASE_DIR, "public")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
+PYDENTICON_FORMAT = 'png'
 
+# PIPELINE = {
+#     'STYLESHEETS': {
+#         'group': {
+#             'source_filenames': (
+#                 'styles/*.css',
+#             ),
+#             'output_filename': 'styles/main.css',
+#             'extra_context': {
+#                 'media': 'screen,projection',
+#             },
+#         },
+#     },
+#     'JAVASCRIPT': {
+#         'group': {
+#             'source_filenames': (
+#                 'scripts/*.js',
+#             ),
+#             'output_filename': 'scripts/main.js',
+#         }
+#     }
+# }
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "public/site"),
-    os.path.join(BASE_DIR, "public/app")
-)
+# API Configuration
 
 TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_DEFAULT_FORMATS = ['json', 'jsonp']
-
+THROTTLE_TIMEOUT = 150
 TASTYPIE_API_VERSION = 'v1'
 
 KONG_ADMIN_URL = 'http://localhost:8001'
 KONG_ADMIN_SIMULATOR = False
 
 JET_DEFAULT_THEME = 'light-gray'
+JET_SIDE_MENU_COMPACT = True
+JET_THEMES = []
+
+# Logs
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format':
+            "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt': "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/files.log',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'propagate': True,
+            'filename': 'logs/django.log',
+            'level': 'DEBUG',
+        },
+        'subdomains': {
+            'handlers': ['file'],
+            'filename': 'logs/subdomains.log',
+            'level': 'DEBUG',
+        },
+        'tenant_schemas': {
+            'handlers': ['file'],
+            'filename': 'logs/tenants.log',
+            'level': 'DEBUG',
+        },
+    }
+}

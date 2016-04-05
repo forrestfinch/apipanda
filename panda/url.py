@@ -33,8 +33,23 @@ urlpatterns = patterns(
 
 urlpatterns += patterns(
     'client',
-    url(r'^app/',
-        TemplateView.as_view(template_name='home.html')),
+    url(r'^home/$',
+        TemplateView.as_view(template_name='common/home.html'), name="home"),
+    url(r'^hubs/$',
+        TemplateView.as_view(template_name='common/hubs.html'), name="hubs"),
+    url(r'^login/$',
+        TemplateView.as_view(template_name='common/login.html'), name="login"),
+    url(r'^register/$',
+        TemplateView.as_view(template_name='common/register.html'),
+        name="register"),
+    url(r'^reset/$',
+        TemplateView.as_view(template_name='common/reset.html'),
+        name="reset"),
+
+    url(r'^dashboard/$',
+        TemplateView.as_view(template_name='account/home.html'),
+        name="dashboard"),
+
     url(r'^$', TemplateView.as_view(
         template_name='index.html')),
 )
@@ -52,6 +67,6 @@ urlpatterns += patterns(
     url(r'ab/',
         include('experiments.urls')),
     # Everyother views redirects here
-    # url(r'^',
-    # TemplateView.as_view(template_name='404.html')),
+    url(r'^',
+        TemplateView.as_view(template_name='index.html')),
 )
