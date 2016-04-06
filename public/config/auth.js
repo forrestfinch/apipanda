@@ -1,4 +1,6 @@
-app.factory('Auth', ['$sessionStorage', '$localStorage', 'Request', '$window', function($sessionStorage, $localStorage, Request, $window) {
+app.factory('Auth', ['$sessionStorage', '$localStorage', 'Request', '$window', '$q', function($sessionStorage, $localStorage, Request, $window, $q) {
+
+
     return {
         getAuth: function (auth) {
             // body...
@@ -23,18 +25,31 @@ app.factory('Auth', ['$sessionStorage', '$localStorage', 'Request', '$window', f
             // body...
             return !!cb;
         },
+        $requireAuth: function () {
+            var deferred = $q.defer();
+            if (!!$sessionStorage.auth || !!$localStorage.auth && !!$localStorage.user) {
+                deferred.resolve($localStorage.user);
+            } else {
+                deferred.reject("AUTH_REQUIRED");
+            }
+            return deferred.promise;
+        },
         $logout: function () {
             // body...
-            var endpoint = 'user/logout';
+            var endpoint = 'users/logout';
             var payload = {};
             Request.fetch(endpoint, payload, method='get')
-                .then(function (status, result) {
+                .then(function (resp) {
+                    console.log(resp);
                     $localStorage.$reset();
                     $sessionStorage.$reset();
                     $window.location = '/';
-                }, function (code, err) {
+                }, function (err) {
                     // body...
-                    console.log(code, err);
+                    console.log(err);
+                    $localStorage.$reset();
+                    $sessionStorage.$reset();
+                    $window.location.reload();
                 });
         }
     }
