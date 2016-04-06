@@ -19,17 +19,17 @@ app.config(['$routeProvider', function ($routeProvider) {
   $routeProvider.whenAuthenticated = function (path, route) {
     securedRoutes.push(path); // store all secured routes for use with authRequired() below
     route.resolve = route.resolve || {};
-    route.resolve.user = ['Auth', '$localStorage', function (Auth, $localStorage) {
-      return $localStorage.user;
+    route.resolve.user = ['Auth', function (Auth) {
+      return Auth.$requireAuth();
     }];
-
-    // route.resolve.user = ['Auth', function (Auth) {
-    //   return Auth.$requireAuth();
-    // }];
 
     $routeProvider.when(path, route);
     return this;
   }
+}])
+
+.config(['$httpProvider', 'API_USER', 'API_KEY', function($httpProvider, API_USER, API_KEY) {
+  $httpProvider.defaults.headers.common['Authorization'] = "ApiKey " + API_USER + ":" + API_KEY;
 }])
 
 /**
@@ -38,11 +38,12 @@ app.config(['$routeProvider', function ($routeProvider) {
 * for changes in auth status which might require us to navigate away from a path
 * that we can no longer view.
 */
-.run(['$rootScope', '$location', 'Auth', 'loginRedirectPath', '$localStorage',
-  function ($rootScope, $location, Auth, loginRedirectPath, $localStorage) {
+.run(['$rootScope', '$location', 'Auth', 'loginRedirectPath', '$localStorage', '$sessionStorage',
+  function ($rootScope, $location, Auth, loginRedirectPath, $localStorage, $sessionStorage) {
     // watch for login status changes and redirect if appropriate
-    Auth.$onAuth(check);
-
+    // Auth.$onAuth(check);
+    $rootScope.user = $localStorage.user;
+    $rootScope.logout = Auth.$logout;
     // some of our routes may reject resolve promises with the special {authRequired: true} error
     // this redirects to the login page whenever that is encountered
     $rootScope.$on("$routeChangeError", function (e, next, prev, err) {
@@ -51,14 +52,31 @@ app.config(['$routeProvider', function ($routeProvider) {
       }
     });
 
+    $rootScope.$on("$routeChangeStart", function(e, next, current){
+
+      if (!!next) {
+        if (next.originalPath.toLowerCase() === '/login' || next.originalPath.toLowerCase() === '/signup') {
+          if (!!$sessionStorage.auth || !!$localStorage.auth) {
+            $location.path('/dashboard');
+          };
+        };
+      } else {
+        if (current.originalPath.toLowerCase() === '/login' || current.originalPath.toLowerCase() === '/signup') {
+          if (!!$sessionStorage.auth || !!$localStorage.auth) {
+            $location.path('/dashboard');
+          };
+        };
+      }
+    });
+
     function check(user) {
-      if (!$localStorage.auth && authRequired($location.path())) {
+      if (!$localStorage.user && authRequired($location.path())) {
         $location.path(loginRedirectPath);
       }
     }
 
     function authRequired(path) {
-      // console.log('authRequired?', path, securedRoutes.indexOf(path)); //debug
+      console.log('authRequired?', path, securedRoutes.indexOf(path)); //debug
       return securedRoutes.indexOf(path) !== -1;
     }
   }
