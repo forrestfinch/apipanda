@@ -1,33 +1,71 @@
 {% load static from staticfiles %}
-<div class="container">
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="page-header">
-        <h1 id="containers"><img data-ng-src="{% static 'images/icn.png'  %}" style="height: 100px"></h1>
+
+<!--main content start-->
+<section class="main-content">
+    <section class="wrapper site-min-height">
+      <div class="row mt">
+        <div class="container">
+          <div class="col-lg-12">
+            <div class="jumbotron">
+                  <div class="form-group">
+                    <div class="input-group">
+                      <input type="text" class="form-control search" placeholder="Explore hubs...">
+                      <span class="input-group-btn">
+                        <button class="btn btn-primary search" type="button">Explore</button>
+                      </span>
+                    </div>
+                  </div>
+
+                  <small style="font-size: 1em; text-align: center"><a href="">Apipanda</a> is a fast, secure and scalable developers hub for managing and extending API/Microservice platforms; featuring an API gateway, analytics/business intelligence, sandboxes, developer portal and more.</small>
+              </div>
+            </div>
+        </div>
       </div>
-    </div>
-  </div>
-  <br>
-  <div class="row">
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="bs-component">
-          <div class="jumbotron">
-            <h1>Welcome,</h1>
-            <br>
-            <p><a >Apipanda</a> is a fast, secure and scalable developers hub for managing and extending API/Microservice platforms; featuring an API gateway, analytics/business intelligence, sandboxes, developer portal and more.</p>
-            <br>
-            <h2 class="subtitle text-center">Our BETA launch will be in:</h2>
-            <div class="text-center" id="countdown"></div>
+      <div class="container">
+        <hr class="divider">
+      </div>
+      <div class="row mt">
+        <div class="col-lg-10 col-lg-offset-1">
+          <h4 style="text-align: center">Most Depended on APIs/Microservices</h4>
+          <br>
+          <div class="col-lg-3">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                Panel content
+              </div>
+            </div>
           </div>
         </div>
-    </div>
-  </div>
-</div>
-{% block local_js %}
-<script src="{% static "scripts/jquery.countdown.min.js" %}"></script>
-<script type="text/javascript">
-  $('#countdown').countdown('2016/03/30', function(event) {
-    $(this).html(event.strftime('%w weeks %d days <br /> %H:%M:%S'));
-  });
-</script>
-{% endblock local_js %}
+      </div>
+
+      <div class="row mt">
+        <div class="col-lg-10 col-lg-offset-1">
+          <h4 style="text-align: center">Trending APIs/Microservices</h4>
+          <br>
+          <div class="col-lg-3">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                Panel content
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt">
+        <div class="col-lg-10 col-lg-offset-1">
+          <h4 style="text-align: center">Latest APIs/Microservices</h4>
+          <br>
+          <div class="col-lg-3">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                Panel content
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </section><!--/wrapper -->
+</section><!-- /MAIN CONTENT -->
+
+<!--main content end-->
